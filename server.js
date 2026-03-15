@@ -2,10 +2,14 @@ const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PASSWORD = process.env.APP_PASSWORD || 'brainlancer2026';
+const MISTRAL_API_KEY = 'ah91s2ddFG7sgG3suHteBlpxoo3upwQm';
 
 // Middleware
 app.use(express.json());
@@ -137,26 +141,195 @@ app.get('/', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// API endpoints for demo data
-app.post('/api/analyze-icp', requireAuth, (req, res) => {
-  setTimeout(() => {
-    res.json({
-      company: req.body.company || 'Sample Company',
-      profile: {
-        industry: req.body.industry || 'Software',
-        location: req.body.location || 'Berlin',
-        type: req.body.type || 'B2B',
-        idealCustomer: 'Mid-market B2B companies in DACH region',
-        keyPainPoints: [
-          'Manual lead generation processes',
-          'Low conversion rates',
-          'Limited market intelligence'
-        ],
-        targetCompanySize: '50-500 employees',
-        decisionMakers: 'CMO, Head of Sales, Business Development'
+// Helper: Scrape Website
+async function scrapeWebsite(url) {
+  try {
+    const targetUrl = url || 'https://ki-katapult.de';
+    const response = await axios.get(targetUrl, {
+      timeout: 5000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
     });
-  }, 3000);
+    const $ = cheerio.load(response.data);
+    
+    return {
+      title: $('title').text(),
+      metaDescription: $('meta[name="description"]').attr('content') || '',
+      h1: $('h1').map((i, el) => $(el).text()).get().join(' | '),
+      h2: $('h2').map((i, el) => $(el).text()).get().join(' | '),
+      body: $('body').text().replace(/\s+/g, ' ').substring(0, 2000)
+    };
+  } catch (error) {
+    console.error('Scraping error:', error.message);
+    return null;
+  }
+}
+
+// Helper: Scrape WLW
+async function scrapeWLW(industry, location) {
+  try {
+    const url = `https://www.wlw.de/de/suche?q=${encodeURIComponent(industry)}&location=${encodeURIComponent(location)}`;
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    const $ = cheerio.load(response.data);
+    const companies = [];
+    
+    $('.company-card').each((i, el) => {
+      if (i >= 10) return;
+      const name = $(el).find('.company-card__name').text().trim();
+      const website = $(el).find('a[data-event-label="Website"]').attr('href');
+      const desc = $(el).find('.company-card__description').text().trim();
+      if (name) companies.push({ name, website, description: desc, source: 'wlw' });
+    });
+    
+    return companies;
+  } catch (error) {
+    return [];
+  }
+}
+
+// Helper: Scrape Kompass
+async function scrapeKompass(industry) {
+  try {
+    const url = `https://www.kompass.com/a/search.html?text=${encodeURIComponent(industry)}&country=DE`;
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    const $ = cheerio.load(response.data);
+    const companies = [];
+    
+    $('.product-list-item').each((i, el) => {
+      if (i >= 10) return;
+      const name = $(el).find('h2').text().trim();
+      const website = $(el).find('.website-link').attr('href');
+      const desc = $(el).find('.description').text().trim();
+      if (name) companies.push({ name, website, description: desc, source: 'kompass' });
+    });
+    
+    return companies;
+  } catch (error) {
+    return [];
+  }
+}
+
+// Helper: Scrape NorthData
+async function scrapeNorthData(industry, location) {
+  try {
+    const url = `https://www.northdata.de/suche?query=${encodeURIComponent(industry + ' ' + location)}`;
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    const $ = cheerio.load(response.data);
+    const companies = [];
+    
+    $('.result-row').each((i, el) => {
+      if (i >= 10) return;
+      const name = $(el).find('.name').text().trim();
+      const website = null; // NorthData often doesn't show direct website in search results
+      const desc = $(el).find('.activity').text().trim();
+      if (name) companies.push({ name, website, description: desc, source: 'northdata' });
+    });
+    
+    return companies;
+  } catch (error) {
+    return [];
+  }
+}
+
+// API endpoint for real analysis
+app.post('/api/analyze-icp', requireAuth, async (req, res) => {
+  const { website, industry, location } = req.body;
+
+  try {
+    // Step A: Scrape submitted website
+    const scrapedWebsite = await scrapeWebsite(website);
+
+    // Step B: Scrape B2B directories
+    const [wlwResults, kompassResults, northDataResults] = await Promise.all([
+      scrapeWLW(industry, location),
+      scrapeKompass(industry),
+      scrapeNorthData(industry, location)
+    ]);
+
+    const allCompanies = [...wlwResults, ...kompassResults, ...northDataResults];
+
+    // Step C: AI Analysis with Mistral
+    const systemPrompt = `You are an expert B2B Sales Strategist. 
+Analyze the provided company website content and a list of potentially matching leads.
+Your goal is to define the Ideal Customer Profile (ICP) for the company and rank the leads based on fit.
+Filter out any B2C companies (no retail shops, restaurants, consumers). Focus on B2B.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "profile": {
+    "idealCustomer": "string",
+    "targetCompanySize": "string",
+    "decisionMakers": "string",
+    "keyPainPoints": ["string"],
+    "recommendedIndustries": ["string"]
+  },
+  "companies": [
+    {
+      "name": "string",
+      "website": "string",
+      "location": "string",
+      "score": number,
+      "hook": "string",
+      "reason": "string"
+    }
+  ]
+}`;
+
+    const userPrompt = `
+COMPANY WEBSITE CONTENT:
+${JSON.stringify(scrapedWebsite)}
+
+TARGET INDUSTRY: ${industry}
+TARGET LOCATION: ${location}
+
+POTENTIAL LEADS FOUND VIA SCRAPING:
+${JSON.stringify(allCompanies)}
+
+Generate the ICP and analyze the companies found. 
+IMPORTANT: If the list of leads found via scraping is empty or contains fewer than 5 high-quality B2B matches, use your internal knowledge to suggest the most relevant B2B companies in ${location} for the ${industry} industry that would be a perfect fit for the ICP.
+Provide personalized outreach hooks for the top 5 matches (either from the scraped list or your suggestions).
+If website scraping failed, base your analysis on the industry and location provided.
+`;
+
+    const mistralRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${MISTRAL_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'mistral-large-latest',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    if (!mistralRes.ok) {
+      throw new Error(`Mistral API error: ${mistralRes.statusText}`);
+    }
+
+    const mistralData = await mistralRes.json();
+    const result = JSON.parse(mistralData.choices[0].message.content);
+
+    res.json(result);
+
+  } catch (error) {
+    console.error('API Error:', error);
+    res.status(500).json({ error: 'Failed to perform analysis. ' + error.message });
+  }
 });
 
 // Start server

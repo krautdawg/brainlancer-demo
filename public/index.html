@@ -17,34 +17,13 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
 
-    @keyframes scan {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
-    }
-
     .fade-in { animation: fadeIn 0.6s ease-out forwards; }
-    .slide-in { animation: slideIn 0.5s ease-out forwards; }
     .pulse { animation: pulse 2s ease-in-out infinite; }
-
-    .scanner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
-      background: linear-gradient(180deg, transparent 0%, rgba(34, 197, 94, 0.2) 50%, transparent 100%);
-      animation: scan 2s linear infinite;
-    }
 
     .gradient-border {
       position: relative;
@@ -116,7 +95,7 @@
           <span class="text-green-500 font-semibold">Step 1</span>
         </div>
         <h2 class="text-4xl font-bold mb-4">Define Your Ideal Customer Profile</h2>
-        <p class="text-slate-400">Help our AI understand your target market</p>
+        <p class="text-slate-400">Analyze your website and target market</p>
       </div>
 
       <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl">
@@ -128,7 +107,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-slate-300 mb-2">Website</label>
-              <input type="url" id="website" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="https://example.com">
+              <input type="url" id="website" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="https://ki-katapult.de">
             </div>
           </div>
 
@@ -136,14 +115,16 @@
             <div>
               <label class="block text-sm font-medium text-slate-300 mb-2">Industry</label>
               <select id="industry" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                <option>Software & SaaS</option>
-                <option>Manufacturing</option>
-                <option>Professional Services</option>
-                <option>E-Commerce</option>
-                <option>Healthcare</option>
-                <option>Finance</option>
-                <option>Real Estate</option>
-                <option>Other</option>
+                <option value="Software & SaaS">Software & SaaS</option>
+                <option value="Consulting">Consulting</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Logistics">Logistics</option>
+                <option value="Finance">Finance</option>
+                <option value="Legal">Legal</option>
+                <option value="Marketing">Marketing</option>
+                <option value="HR & Recruitment">HR & Recruitment</option>
+                <option value="Construction">Construction</option>
+                <option value="Healthcare (B2B)">Healthcare (B2B)</option>
               </select>
             </div>
             <div>
@@ -152,333 +133,65 @@
             </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-3">Business Type</label>
-            <div class="flex gap-4">
-              <label class="flex-1 cursor-pointer">
-                <input type="radio" name="businessType" value="B2B" class="sr-only peer" checked>
-                <div class="bg-slate-900 border-2 border-slate-700 rounded-lg p-4 text-center peer-checked:border-green-500 peer-checked:bg-green-500/10 transition">
-                  <div class="font-semibold">B2B</div>
-                  <div class="text-sm text-slate-400">Business to Business</div>
-                </div>
-              </label>
-              <label class="flex-1 cursor-pointer">
-                <input type="radio" name="businessType" value="B2C" class="sr-only peer">
-                <div class="bg-slate-900 border-2 border-slate-700 rounded-lg p-4 text-center peer-checked:border-green-500 peer-checked:bg-green-500/10 transition">
-                  <div class="font-semibold">B2C</div>
-                  <div class="text-sm text-slate-400">Business to Consumer</div>
-                </div>
-              </label>
-            </div>
-          </div>
-
           <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg transition duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
-            Analyze ICP
+            Analyze Website & Find Leads
           </button>
         </form>
 
         <!-- Loading State -->
-        <div id="icpLoading" class="hidden mt-8 text-center">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-green-500 mb-4"></div>
-          <p class="text-slate-400">Analyzing your ideal customer profile...</p>
+        <div id="icpLoading" class="hidden mt-8">
+          <div class="bg-slate-900 rounded-xl p-6 border border-slate-700">
+            <div class="flex items-center justify-center mb-6">
+              <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-green-500"></div>
+            </div>
+            <h4 class="text-center text-xl font-bold mb-4">Analyzing your website...</h4>
+            <div class="space-y-4">
+              <div id="step1-status" class="flex items-center text-slate-400">
+                <div class="status-icon mr-3">○</div>
+                <span>Step 1: Reading website content</span>
+              </div>
+              <div id="step2-status" class="flex items-center text-slate-400">
+                <div class="status-icon mr-3">○</div>
+                <span>Step 2: Finding matching companies in directories</span>
+              </div>
+              <div id="step3-status" class="flex items-center text-slate-400">
+                <div class="status-icon mr-3">○</div>
+                <span>Step 3: AI scoring and outreach generation</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ICP Result -->
-        <div id="icpResult" class="hidden mt-8 space-y-4 fade-in">
+        <div id="icpResult" class="hidden mt-8 space-y-6 fade-in">
           <div class="bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/30 rounded-xl p-6">
-            <h3 class="text-xl font-bold mb-4 text-green-400">✓ ICP Profile Generated</h3>
-            <div class="grid md:grid-cols-2 gap-4 text-sm">
+            <h3 class="text-xl font-bold mb-4 text-green-400">✓ AI Analysis Complete</h3>
+            <div class="grid md:grid-cols-2 gap-6 text-sm">
               <div>
-                <div class="text-slate-400 mb-1">Ideal Customer</div>
-                <div class="font-medium" id="icpIdealCustomer"></div>
+                <div class="text-slate-400 mb-1 uppercase tracking-wider text-xs font-bold">Ideal Customer</div>
+                <div class="font-medium text-lg" id="icpIdealCustomer"></div>
               </div>
               <div>
-                <div class="text-slate-400 mb-1">Target Company Size</div>
-                <div class="font-medium" id="icpCompanySize"></div>
+                <div class="text-slate-400 mb-1 uppercase tracking-wider text-xs font-bold">Target Company Size</div>
+                <div class="font-medium text-lg" id="icpCompanySize"></div>
               </div>
               <div class="md:col-span-2">
-                <div class="text-slate-400 mb-2">Key Pain Points</div>
-                <div id="icpPainPoints" class="space-y-1"></div>
+                <div class="text-slate-400 mb-2 uppercase tracking-wider text-xs font-bold">Key Pain Points</div>
+                <div id="icpPainPoints" class="grid md:grid-cols-2 gap-2"></div>
               </div>
               <div class="md:col-span-2">
-                <div class="text-slate-400 mb-1">Decision Makers</div>
-                <div class="font-medium" id="icpDecisionMakers"></div>
+                <div class="text-slate-400 mb-1 uppercase tracking-wider text-xs font-bold">Recommended Industries</div>
+                <div id="icpRecommendedIndustries" class="flex flex-wrap gap-2 mt-2"></div>
               </div>
             </div>
-            <button onclick="scrollToSection('step2')" class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition">
-              Discover Leads →
-            </button>
+          </div>
+
+          <div id="leadsContainer" class="space-y-4">
+            <h3 class="text-2xl font-bold mt-8 mb-4">Top Lead Recommendations</h3>
+            <div id="leadsList" class="space-y-4"></div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Step 2: Lead Discovery -->
-  <section id="step2" class="py-16 px-4">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12">
-        <div class="inline-block bg-green-500/10 rounded-full px-4 py-2 mb-4">
-          <span class="text-green-500 font-semibold">Step 2</span>
-        </div>
-        <h2 class="text-4xl font-bold mb-4">Lead Discovery</h2>
-        <p class="text-slate-400">AI-powered scanning across multiple sources</p>
-      </div>
-
-      <!-- Scanning Animation -->
-      <div id="scanningAnimation" class="hidden mb-12">
-        <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700">
-          <div class="relative h-48 bg-slate-900 rounded-lg overflow-hidden mb-6">
-            <div class="scanner"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="text-center">
-                <div class="text-green-500 text-2xl font-bold mb-2">Scanning...</div>
-                <div class="text-slate-400" id="scanStatus">Initializing sources</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4">
-            <div id="source1" class="bg-slate-900 rounded-lg p-4 opacity-50 transition-opacity">
-              <div class="flex items-center justify-between">
-                <span class="text-sm">Company Registries</span>
-                <span class="source-check hidden text-green-500">✓</span>
-              </div>
-            </div>
-            <div id="source2" class="bg-slate-900 rounded-lg p-4 opacity-50 transition-opacity">
-              <div class="flex items-center justify-between">
-                <span class="text-sm">LinkedIn Signals</span>
-                <span class="source-check hidden text-green-500">✓</span>
-              </div>
-            </div>
-            <div id="source3" class="bg-slate-900 rounded-lg p-4 opacity-50 transition-opacity">
-              <div class="flex items-center justify-between">
-                <span class="text-sm">News & Events</span>
-                <span class="source-check hidden text-green-500">✓</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lead Cards -->
-      <div id="leadCards" class="hidden space-y-4">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-2xl font-bold">Found 5 High-Quality Leads</h3>
-          <button onclick="scrollToSection('step4')" class="text-green-500 hover:text-green-400 transition">
-            View Dashboard →
-          </button>
-        </div>
-
-        <!-- Lead 1 -->
-        <div class="lead-card gradient-border rounded-xl p-6 cursor-pointer hover:scale-[1.02] transition-transform" onclick="expandLead(1)">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex-1">
-              <h4 class="text-xl font-bold mb-1">TechVision Potsdam GmbH</h4>
-              <p class="text-slate-400 text-sm">Software Development • Potsdam, Brandenburg</p>
-            </div>
-            <div class="bg-green-500/20 border border-green-500 rounded-lg px-3 py-1">
-              <span class="text-green-400 font-bold">92% Match</span>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Company Size</div>
-              <div class="font-medium">85 employees</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Revenue Est.</div>
-              <div class="font-medium">€5-10M</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Industry</div>
-              <div class="font-medium">B2B SaaS</div>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/50 rounded-lg p-3 mb-4">
-            <div class="text-xs text-green-400 font-semibold mb-2">🎯 Pain Signals Detected</div>
-            <ul class="text-sm space-y-1 text-slate-300">
-              <li>• Recent job posting for "Sales Development Representative"</li>
-              <li>• LinkedIn post about scaling challenges</li>
-            </ul>
-          </div>
-
-          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-            <div class="text-xs text-blue-400 font-semibold mb-1">💡 Outreach Angle</div>
-            <p class="text-sm text-slate-300">"Help your growing SDR team with automated local lead generation"</p>
-          </div>
-        </div>
-
-        <!-- Lead 2 -->
-        <div class="lead-card gradient-border rounded-xl p-6 cursor-pointer hover:scale-[1.02] transition-transform" onclick="expandLead(2)">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex-1">
-              <h4 class="text-xl font-bold mb-1">Brandenburg Digital Solutions</h4>
-              <p class="text-slate-400 text-sm">Marketing Agency • Werder (Havel), Brandenburg</p>
-            </div>
-            <div class="bg-green-500/20 border border-green-500 rounded-lg px-3 py-1">
-              <span class="text-green-400 font-bold">89% Match</span>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Company Size</div>
-              <div class="font-medium">45 employees</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Revenue Est.</div>
-              <div class="font-medium">€3-5M</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Industry</div>
-              <div class="font-medium">Marketing</div>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/50 rounded-lg p-3 mb-4">
-            <div class="text-xs text-green-400 font-semibold mb-2">🎯 Pain Signals Detected</div>
-            <ul class="text-sm space-y-1 text-slate-300">
-              <li>• Recently expanded to new office in Potsdam</li>
-              <li>• Case study mentions "lead generation bottlenecks"</li>
-            </ul>
-          </div>
-
-          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-            <div class="text-xs text-blue-400 font-semibold mb-1">💡 Outreach Angle</div>
-            <p class="text-sm text-slate-300">"Support your expansion with local B2B leads in Brandenburg"</p>
-          </div>
-        </div>
-
-        <!-- Lead 3 -->
-        <div class="lead-card gradient-border rounded-xl p-6 cursor-pointer hover:scale-[1.02] transition-transform" onclick="expandLead(3)">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex-1">
-              <h4 class="text-xl font-bold mb-1">Havel Consulting Partners</h4>
-              <p class="text-slate-400 text-sm">Business Consulting • Potsdam, Brandenburg</p>
-            </div>
-            <div class="bg-green-500/20 border border-green-500 rounded-lg px-3 py-1">
-              <span class="text-green-400 font-bold">87% Match</span>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Company Size</div>
-              <div class="font-medium">32 employees</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Revenue Est.</div>
-              <div class="font-medium">€2-4M</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Industry</div>
-              <div class="font-medium">Consulting</div>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/50 rounded-lg p-3 mb-4">
-            <div class="text-xs text-green-400 font-semibold mb-2">🎯 Pain Signals Detected</div>
-            <ul class="text-sm space-y-1 text-slate-300">
-              <li>• Speaking at "Digital Transformation Summit Berlin 2026"</li>
-              <li>• Website updated with new "Growth Services" offering</li>
-            </ul>
-          </div>
-
-          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-            <div class="text-xs text-blue-400 font-semibold mb-1">💡 Outreach Angle</div>
-            <p class="text-sm text-slate-300">"Add data-driven lead gen to your growth service portfolio"</p>
-          </div>
-        </div>
-
-        <!-- Lead 4 -->
-        <div class="lead-card gradient-border rounded-xl p-6 cursor-pointer hover:scale-[1.02] transition-transform" onclick="expandLead(4)">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex-1">
-              <h4 class="text-xl font-bold mb-1">StartHub Berlin-Brandenburg</h4>
-              <p class="text-slate-400 text-sm">Startup Accelerator • Berlin</p>
-            </div>
-            <div class="bg-green-500/20 border border-green-500 rounded-lg px-3 py-1">
-              <span class="text-green-400 font-bold">85% Match</span>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Company Size</div>
-              <div class="font-medium">28 employees</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Revenue Est.</div>
-              <div class="font-medium">€1-3M</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Industry</div>
-              <div class="font-medium">Accelerator</div>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/50 rounded-lg p-3 mb-4">
-            <div class="text-xs text-green-400 font-semibold mb-2">🎯 Pain Signals Detected</div>
-            <ul class="text-sm space-y-1 text-slate-300">
-              <li>• New cohort announcement for 15 B2B startups</li>
-              <li>• Partnership with Brandenburg Economic Development</li>
-            </ul>
-          </div>
-
-          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-            <div class="text-xs text-blue-400 font-semibold mb-1">💡 Outreach Angle</div>
-            <p class="text-sm text-slate-300">"Empower your portfolio companies with local B2B connections"</p>
-          </div>
-        </div>
-
-        <!-- Lead 5 -->
-        <div class="lead-card gradient-border rounded-xl p-6 cursor-pointer hover:scale-[1.02] transition-transform" onclick="expandLead(5)">
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex-1">
-              <h4 class="text-xl font-bold mb-1">InnovateBrandenburg AG</h4>
-              <p class="text-slate-400 text-sm">Innovation Hub • Falkensee, Brandenburg</p>
-            </div>
-            <div class="bg-green-500/20 border border-green-500 rounded-lg px-3 py-1">
-              <span class="text-green-400 font-bold">83% Match</span>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Company Size</div>
-              <div class="font-medium">52 employees</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Revenue Est.</div>
-              <div class="font-medium">€4-7M</div>
-            </div>
-            <div>
-              <div class="text-xs text-slate-500 mb-1">Industry</div>
-              <div class="font-medium">Innovation</div>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/50 rounded-lg p-3 mb-4">
-            <div class="text-xs text-green-400 font-semibold mb-2">🎯 Pain Signals Detected</div>
-            <ul class="text-sm space-y-1 text-slate-300">
-              <li>• Launched "Connect Brandenburg" networking initiative</li>
-              <li>• CEO interview mentions "breaking Berlin bubble"</li>
-            </ul>
-          </div>
-
-          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-            <div class="text-xs text-blue-400 font-semibold mb-1">💡 Outreach Angle</div>
-            <p class="text-sm text-slate-300">"Amplify your network effect with AI-powered regional connections"</p>
-          </div>
-        </div>
-      </div>
-
-      <button id="startDiscovery" onclick="startLeadDiscovery()" class="w-full max-w-md mx-auto block bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg transition duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
-        Start Lead Discovery
-      </button>
     </div>
   </section>
 
@@ -490,7 +203,7 @@
           <div class="flex justify-between items-start mb-6">
             <div>
               <div class="inline-block bg-green-500/10 rounded-full px-4 py-2 mb-4">
-                <span class="text-green-500 font-semibold">Step 3: Lead Enrichment</span>
+                <span class="text-green-500 font-semibold">Lead Details</span>
               </div>
               <h3 class="text-3xl font-bold mb-2" id="modalCompanyName">Company Name</h3>
               <p class="text-slate-400" id="modalCompanyInfo">Company Info</p>
@@ -503,87 +216,23 @@
           </div>
 
           <div class="space-y-6">
-            <!-- Expanded Profile -->
             <div class="bg-slate-900/50 rounded-xl p-6">
-              <h4 class="font-bold mb-4 text-green-400">📊 Enriched Profile</h4>
-              <div class="grid md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <div class="text-slate-500 mb-1">Decision Maker</div>
-                  <div class="font-medium" id="modalDecisionMaker">Name, Title</div>
-                </div>
-                <div>
-                  <div class="text-slate-500 mb-1">LinkedIn Activity</div>
-                  <div class="font-medium">Active in last 7 days</div>
-                </div>
-                <div>
-                  <div class="text-slate-500 mb-1">Tech Stack</div>
-                  <div class="font-medium">HubSpot, Salesforce, Slack</div>
-                </div>
-                <div>
-                  <div class="text-slate-500 mb-1">Recent Funding</div>
-                  <div class="font-medium">Series A (€2M)</div>
-                </div>
-              </div>
+              <h4 class="font-bold mb-4 text-green-400">🎯 Why they are a fit</h4>
+              <p id="modalReason" class="text-slate-300 text-sm leading-relaxed"></p>
             </div>
 
-            <!-- Personalized Email -->
             <div class="bg-slate-900/50 rounded-xl p-6">
               <div class="flex justify-between items-center mb-4">
-                <h4 class="font-bold text-green-400">✉️ Personalized Email Draft</h4>
-                <button class="text-sm text-green-500 hover:text-green-400 transition">Copy</button>
+                <h4 class="font-bold text-green-400">✉️ AI-Generated Outreach Hook</h4>
+                <button class="text-sm text-green-500 hover:text-green-400 transition" onclick="copyHook()">Copy</button>
               </div>
-              <div class="bg-slate-800 rounded-lg p-4 text-sm space-y-2 font-mono">
-                <div><span class="text-slate-500">Subject:</span> <span id="emailSubject">Quick win for [Company]'s growth</span></div>
-                <div class="border-t border-slate-700 pt-2 mt-2 text-slate-300" id="emailBody">
-                  Hi [Name],<br><br>
-                  I noticed [Company] is [specific trigger]. Many companies at your stage struggle with [pain point].<br><br>
-                  We help [similar companies] in Brandenburg generate qualified B2B leads through AI-powered local discovery.<br><br>
-                  Would a 15-min call next week make sense?<br><br>
-                  Best,<br>
-                  [Your Name]
-                </div>
-              </div>
-            </div>
-
-            <!-- Follow-up Timeline -->
-            <div class="bg-slate-900/50 rounded-xl p-6">
-              <h4 class="font-bold mb-4 text-green-400">📅 Recommended Follow-up Timeline</h4>
-              <div class="space-y-3">
-                <div class="flex items-start space-x-3">
-                  <div class="bg-green-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm font-bold">1</div>
-                  <div class="flex-1">
-                    <div class="font-medium">Day 0 - Initial Contact</div>
-                    <div class="text-sm text-slate-400">Send personalized email</div>
-                  </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                  <div class="bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm font-bold">2</div>
-                  <div class="flex-1">
-                    <div class="font-medium">Day 3 - LinkedIn Connection</div>
-                    <div class="text-sm text-slate-400">Connect with personalized note</div>
-                  </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                  <div class="bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm font-bold">3</div>
-                  <div class="flex-1">
-                    <div class="font-medium">Day 7 - Follow-up Email</div>
-                    <div class="text-sm text-slate-400">Share relevant case study</div>
-                  </div>
-                </div>
-                <div class="flex items-start space-x-3">
-                  <div class="bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm font-bold">4</div>
-                  <div class="flex-1">
-                    <div class="font-medium">Day 14 - Final Touch</div>
-                    <div class="text-sm text-slate-400">Last attempt with value-add content</div>
-                  </div>
-                </div>
-              </div>
+              <div class="bg-slate-800 rounded-lg p-4 text-sm font-mono text-slate-300 italic" id="modalHook"></div>
             </div>
 
             <div class="flex gap-4">
-              <button class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition">
-                Add to CRM
-              </button>
+              <a id="modalWebsite" href="#" target="_blank" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-center font-semibold py-3 px-6 rounded-lg transition">
+                Visit Website
+              </a>
               <button onclick="closeEnrichmentModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-lg transition">
                 Close
               </button>
@@ -594,298 +243,143 @@
     </div>
   </div>
 
-  <!-- Step 4: CRM Dashboard -->
-  <section id="step4" class="py-16 px-4 bg-slate-800/50">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-12">
-        <div class="inline-block bg-green-500/10 rounded-full px-4 py-2 mb-4">
-          <span class="text-green-500 font-semibold">Step 4</span>
-        </div>
-        <h2 class="text-4xl font-bold mb-4">CRM Dashboard</h2>
-        <p class="text-slate-400">Track your pipeline and performance</p>
-      </div>
-
-      <!-- Stats Grid -->
-      <div class="grid md:grid-cols-4 gap-6 mb-12">
-        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <div class="text-slate-400 text-sm mb-2">Total Leads</div>
-          <div class="text-3xl font-bold text-white">247</div>
-          <div class="text-green-500 text-sm mt-2">↑ 18% this week</div>
-        </div>
-        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <div class="text-slate-400 text-sm mb-2">Qualified</div>
-          <div class="text-3xl font-bold text-white">89</div>
-          <div class="text-green-500 text-sm mt-2">↑ 24% this week</div>
-        </div>
-        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <div class="text-slate-400 text-sm mb-2">In Contact</div>
-          <div class="text-3xl font-bold text-white">34</div>
-          <div class="text-yellow-500 text-sm mt-2">→ 5% this week</div>
-        </div>
-        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <div class="text-slate-400 text-sm mb-2">Closed Won</div>
-          <div class="text-3xl font-bold text-white">12</div>
-          <div class="text-green-500 text-sm mt-2">↑ 33% this week</div>
-        </div>
-      </div>
-
-      <!-- Pipeline Funnel -->
-      <div class="bg-slate-800 rounded-xl p-8 border border-slate-700 mb-8">
-        <h3 class="text-xl font-bold mb-6">Pipeline Funnel</h3>
-        <div class="space-y-4">
-          <div>
-            <div class="flex justify-between mb-2">
-              <span class="text-sm text-slate-400">New Leads</span>
-              <span class="text-sm font-semibold">247</span>
-            </div>
-            <div class="bg-slate-900 rounded-full h-3 overflow-hidden">
-              <div class="bg-green-500 h-full rounded-full" style="width: 100%"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between mb-2">
-              <span class="text-sm text-slate-400">Qualified</span>
-              <span class="text-sm font-semibold">89 (36%)</span>
-            </div>
-            <div class="bg-slate-900 rounded-full h-3 overflow-hidden">
-              <div class="bg-green-400 h-full rounded-full" style="width: 36%"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between mb-2">
-              <span class="text-sm text-slate-400">In Contact</span>
-              <span class="text-sm font-semibold">34 (14%)</span>
-            </div>
-            <div class="bg-slate-900 rounded-full h-3 overflow-hidden">
-              <div class="bg-yellow-500 h-full rounded-full" style="width: 14%"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between mb-2">
-              <span class="text-sm text-slate-400">Closed Won</span>
-              <span class="text-sm font-semibold">12 (5%)</span>
-            </div>
-            <div class="bg-slate-900 rounded-full h-3 overflow-hidden">
-              <div class="bg-blue-500 h-full rounded-full" style="width: 5%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Source Performance -->
-      <div class="bg-slate-800 rounded-xl p-8 border border-slate-700">
-        <h3 class="text-xl font-bold mb-6">Source Performance</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="bg-slate-900/50 rounded-lg p-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-medium">Company Registries</span>
-              <span class="text-green-500 font-bold">42%</span>
-            </div>
-            <div class="text-sm text-slate-400">104 leads</div>
-          </div>
-          <div class="bg-slate-900/50 rounded-lg p-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-medium">LinkedIn Signals</span>
-              <span class="text-green-500 font-bold">35%</span>
-            </div>
-            <div class="text-sm text-slate-400">86 leads</div>
-          </div>
-          <div class="bg-slate-900/50 rounded-lg p-4">
-            <div class="flex items-center justify-between mb-3">
-              <span class="font-medium">News & Events</span>
-              <span class="text-green-500 font-bold">23%</span>
-            </div>
-            <div class="text-sm text-slate-400">57 leads</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Footer -->
   <footer class="bg-slate-800 border-t border-slate-700 py-12 px-4">
-    <div class="max-w-7xl mx-auto">
-      <div class="grid md:grid-cols-3 gap-8 mb-8">
-        <div>
-          <div class="flex items-center space-x-3 mb-4">
-            <div class="bg-green-500 rounded-lg p-2">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </div>
-            <span class="text-xl font-bold">Local Lead Engine</span>
-          </div>
-          <p class="text-slate-400 text-sm">AI-Powered B2B Lead Generation for the DACH Region</p>
+    <div class="max-w-7xl mx-auto text-center">
+      <div class="flex items-center justify-center space-x-3 mb-4">
+        <div class="bg-green-500 rounded-lg p-2">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
         </div>
-        <div>
-          <h4 class="font-semibold mb-4">Product</h4>
-          <ul class="space-y-2 text-slate-400 text-sm">
-            <li><a href="#step1" class="hover:text-white transition">ICP Analysis</a></li>
-            <li><a href="#step2" class="hover:text-white transition">Lead Discovery</a></li>
-            <li><a href="#step4" class="hover:text-white transition">CRM Dashboard</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">Company</h4>
-          <ul class="space-y-2 text-slate-400 text-sm">
-            <li><a href="#" class="hover:text-white transition">About KI Katapult</a></li>
-            <li><a href="#" class="hover:text-white transition">Contact</a></li>
-            <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
-          </ul>
-        </div>
+        <span class="text-xl font-bold">Local Lead Engine</span>
       </div>
-      <div class="border-t border-slate-700 pt-8 flex flex-col md:flex-row justify-between items-center">
-        <p class="text-slate-500 text-sm mb-4 md:mb-0">&copy; 2026 Local Lead Engine. Powered by KI Katapult.</p>
-        <div class="flex items-center space-x-6 text-slate-400 text-sm">
-          <a href="#" class="hover:text-white transition">LinkedIn</a>
-          <a href="#" class="hover:text-white transition">Twitter</a>
-          <a href="#" class="hover:text-white transition">Email</a>
-        </div>
-      </div>
+      <p class="text-slate-500 text-sm">&copy; 2026 Local Lead Engine. Powered by KI Katapult.</p>
     </div>
   </footer>
 
   <script>
-    // Smooth scroll
+    let currentLeads = [];
+
     function scrollToSection(id) {
       document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ICP Form Handler
+    function setStatus(step, status) {
+      const el = document.getElementById(`step${step}-status`);
+      const icon = el.querySelector('.status-icon');
+      if (status === 'loading') {
+        icon.textContent = '●';
+        icon.classList.add('text-green-500', 'pulse');
+        el.classList.remove('text-slate-400');
+        el.classList.add('text-white');
+      } else if (status === 'done') {
+        icon.textContent = '✓';
+        icon.classList.remove('pulse');
+        icon.classList.add('text-green-500');
+        el.classList.add('text-slate-300');
+      }
+    }
+
     document.getElementById('icpForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const form = e.target;
-      const formData = new FormData(form);
+      const icpLoading = document.getElementById('icpLoading');
+      const icpResult = document.getElementById('icpResult');
 
-      // Show loading
-      document.getElementById('icpLoading').classList.remove('hidden');
+      icpLoading.classList.remove('hidden');
+      icpResult.classList.add('hidden');
       form.classList.add('hidden');
 
-      // Simulate API call
+      setStatus(1, 'loading');
+      
+      // Simulate progress timing for UI
+      setTimeout(() => setStatus(1, 'done'), 2000);
+      setTimeout(() => setStatus(2, 'loading'), 2100);
+      setTimeout(() => setStatus(2, 'done'), 6000);
+      setTimeout(() => setStatus(3, 'loading'), 6100);
+
       try {
         const response = await fetch('/api/analyze-icp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            company: formData.get('companyName') || document.getElementById('companyName').value,
+            company: document.getElementById('companyName').value,
             website: document.getElementById('website').value,
             industry: document.getElementById('industry').value,
-            location: document.getElementById('location').value,
-            type: document.querySelector('input[name="businessType"]:checked').value
+            location: document.getElementById('location').value
           })
         });
 
+        if (!response.ok) throw new Error('Analysis failed');
         const data = await response.json();
 
-        // Hide loading, show result
-        document.getElementById('icpLoading').classList.add('hidden');
-        const result = document.getElementById('icpResult');
-        result.classList.remove('hidden');
-
-        // Populate result
-        document.getElementById('icpIdealCustomer').textContent = data.profile.idealCustomer;
-        document.getElementById('icpCompanySize').textContent = data.profile.targetCompanySize;
-        document.getElementById('icpDecisionMakers').textContent = data.profile.decisionMakers;
-
-        const painPoints = document.getElementById('icpPainPoints');
-        painPoints.innerHTML = data.profile.keyPainPoints.map(point =>
-          `<div class="flex items-start"><span class="text-green-500 mr-2">•</span><span>${point}</span></div>`
-        ).join('');
+        setStatus(3, 'done');
+        setTimeout(() => {
+          icpLoading.classList.add('hidden');
+          icpResult.classList.remove('hidden');
+          displayResults(data);
+        }, 500);
 
       } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('icpLoading').classList.add('hidden');
+        alert('Error: ' + error.message);
+        icpLoading.classList.add('hidden');
         form.classList.remove('hidden');
       }
     });
 
-    // Lead Discovery
-    function startLeadDiscovery() {
-      const button = document.getElementById('startDiscovery');
-      button.classList.add('hidden');
+    function displayResults(data) {
+      document.getElementById('icpIdealCustomer').textContent = data.profile.idealCustomer;
+      document.getElementById('icpCompanySize').textContent = data.profile.targetCompanySize;
+      
+      const painPoints = document.getElementById('icpPainPoints');
+      painPoints.innerHTML = data.profile.keyPainPoints.map(p => 
+        `<div class="bg-slate-900/50 p-2 rounded border border-slate-700 flex items-center">
+          <span class="text-green-500 mr-2">✦</span> ${p}
+        </div>`
+      ).join('');
 
-      const scanAnimation = document.getElementById('scanningAnimation');
-      scanAnimation.classList.remove('hidden');
+      const industries = document.getElementById('icpRecommendedIndustries');
+      industries.innerHTML = data.profile.recommendedIndustries.map(ind => 
+        `<span class="bg-green-500/10 text-green-500 border border-green-500/30 px-3 py-1 rounded-full text-xs font-semibold">${ind}</span>`
+      ).join('');
 
-      const sources = ['source1', 'source2', 'source3'];
-      const statuses = [
-        'Scanning company registries...',
-        'Analyzing LinkedIn signals...',
-        'Checking news and events...',
-        'Finalizing results...'
-      ];
-
-      let currentStatus = 0;
-      const statusInterval = setInterval(() => {
-        if (currentStatus < statuses.length) {
-          document.getElementById('scanStatus').textContent = statuses[currentStatus];
-          currentStatus++;
-        }
-      }, 1000);
-
-      sources.forEach((sourceId, index) => {
-        setTimeout(() => {
-          const source = document.getElementById(sourceId);
-          source.classList.remove('opacity-50');
-          source.classList.add('opacity-100');
-          source.querySelector('.source-check').classList.remove('hidden');
-        }, (index + 1) * 1500);
-      });
-
-      setTimeout(() => {
-        clearInterval(statusInterval);
-        scanAnimation.classList.add('hidden');
-        document.getElementById('leadCards').classList.remove('hidden');
-      }, 5000);
+      currentLeads = data.companies;
+      const leadsList = document.getElementById('leadsList');
+      leadsList.innerHTML = data.companies.map((company, index) => `
+        <div class="lead-card gradient-border rounded-xl p-6 cursor-pointer hover:scale-[1.01] transition-transform" onclick="expandLead(${index})">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="text-xl font-bold text-white">${company.name}</h4>
+              <p class="text-slate-400 text-sm">${company.location || 'Location available in full report'}</p>
+            </div>
+            <div class="bg-green-500/20 border border-green-500/50 rounded-lg px-3 py-1">
+              <span class="text-green-400 font-bold">${company.score}% Match</span>
+            </div>
+          </div>
+          <p class="mt-4 text-slate-300 text-sm line-clamp-2 italic">"${company.hook}"</p>
+          <div class="mt-4 flex items-center text-green-500 text-sm font-semibold">
+            <span>View Analysis & Outreach Strategy</span>
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+        </div>
+      `).join('');
     }
 
-    // Lead Enrichment
-    const leadData = {
-      1: {
-        name: 'TechVision Potsdam GmbH',
-        info: 'Software Development • Potsdam, Brandenburg',
-        decisionMaker: 'Sarah Müller, Head of Sales',
-        subject: 'Help your SDR team scale faster',
-        body: `Hi Sarah,\n\nI noticed TechVision recently posted for a Sales Development Representative role. Scaling SDR teams often hits a roadblock with lead quality.\n\nWe help B2B SaaS companies in Brandenburg generate 50+ qualified local leads per month through AI-powered discovery.\n\nWould a 15-min call next Tuesday make sense?\n\nBest,\n[Your Name]`
-      },
-      2: {
-        name: 'Brandenburg Digital Solutions',
-        info: 'Marketing Agency • Werder (Havel), Brandenburg',
-        decisionMaker: 'Michael Schmidt, Managing Director',
-        subject: 'Support your Potsdam expansion',
-        body: `Hi Michael,\n\nCongratulations on the new Potsdam office! Expanding to new markets often means starting your client pipeline from scratch.\n\nWe help agencies in Brandenburg fill their pipeline with 40+ qualified B2B prospects monthly using AI-driven local discovery.\n\nInterested in a quick 15-min demo?\n\nBest,\n[Your Name]`
-      },
-      3: {
-        name: 'Havel Consulting Partners',
-        info: 'Business Consulting • Potsdam, Brandenburg',
-        decisionMaker: 'Dr. Anna Weber, Partner',
-        subject: 'Add data-driven lead gen to your services',
-        body: `Hi Dr. Weber,\n\nI saw you're launching new Growth Services. Many consultancies struggle to offer scalable lead generation to their clients.\n\nWe provide white-label AI-powered lead discovery that you can integrate into your service portfolio.\n\nWould next week work for a brief call?\n\nBest,\n[Your Name]`
-      },
-      4: {
-        name: 'StartHub Berlin-Brandenburg',
-        info: 'Startup Accelerator • Berlin',
-        decisionMaker: 'Thomas Becker, Program Director',
-        subject: 'Empower your portfolio companies',
-        body: `Hi Thomas,\n\nCongratulations on the new B2B cohort! Early-stage startups often struggle most with finding their first customers.\n\nWe offer special pricing for accelerator portfolios - helping startups discover 30+ qualified local leads in their first month.\n\nInterested in exploring this for your cohort?\n\nBest,\n[Your Name]`
-      },
-      5: {
-        name: 'InnovateBrandenburg AG',
-        info: 'Innovation Hub • Falkensee, Brandenburg',
-        decisionMaker: 'Lisa Hoffmann, CEO',
-        subject: 'Amplify your network effect',
-        body: `Hi Lisa,\n\nYour "Connect Brandenburg" initiative is impressive! Building regional networks is powerful, but manual outreach doesn't scale.\n\nWe use AI to map the entire Brandenburg B2B ecosystem - giving you 100+ qualified connection opportunities monthly.\n\nWant to see it in action?\n\nBest,\n[Your Name]`
+    function expandLead(index) {
+      const lead = currentLeads[index];
+      document.getElementById('modalCompanyName').textContent = lead.name;
+      document.getElementById('modalCompanyInfo').textContent = lead.location || 'B2B Lead';
+      document.getElementById('modalReason').textContent = lead.reason;
+      document.getElementById('modalHook').textContent = lead.hook;
+      
+      const webBtn = document.getElementById('modalWebsite');
+      if (lead.website) {
+        webBtn.href = lead.website.startsWith('http') ? lead.website : `https://${lead.website}`;
+        webBtn.classList.remove('hidden');
+      } else {
+        webBtn.classList.add('hidden');
       }
-    };
-
-    function expandLead(leadId) {
-      const data = leadData[leadId];
-      document.getElementById('modalCompanyName').textContent = data.name;
-      document.getElementById('modalCompanyInfo').textContent = data.info;
-      document.getElementById('modalDecisionMaker').textContent = data.decisionMaker;
-      document.getElementById('emailSubject').textContent = data.subject;
-      document.getElementById('emailBody').innerHTML = data.body.replace(/\n/g, '<br>');
 
       document.getElementById('enrichmentModal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -896,11 +390,14 @@
       document.body.style.overflow = 'auto';
     }
 
-    // Close modal on ESC key
+    function copyHook() {
+      const hook = document.getElementById('modalHook').textContent;
+      navigator.clipboard.writeText(hook);
+      alert('Hook copied to clipboard!');
+    }
+
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeEnrichmentModal();
-      }
+      if (e.key === 'Escape') closeEnrichmentModal();
     });
   </script>
 </body>
