@@ -11,7 +11,7 @@ const vatRouter = require('./routes/vat');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PASSWORD = process.env.APP_PASSWORD || 'brainlancer2026';
-const MISTRAL_API_KEY = 'ah91s2ddFG7sgG3suHteBlpxoo3upwQm';
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
 // Middleware
 app.use(express.json());
@@ -256,6 +256,10 @@ app.post('/api/analyze-icp', requireAuth, async (req, res) => {
   const { website, industry, location } = req.body;
 
   try {
+    if (!MISTRAL_API_KEY) {
+      return res.status(500).json({ error: 'Server misconfiguration: MISTRAL_API_KEY is not set.' });
+    }
+
     // Step A: Scrape submitted website
     const scrapedWebsite = await scrapeWebsite(website);
 
