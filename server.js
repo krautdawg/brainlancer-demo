@@ -6,6 +6,8 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
+const vatRouter = require('./routes/vat');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PASSWORD = process.env.APP_PASSWORD || 'brainlancer2026';
@@ -36,6 +38,14 @@ const requireAuth = (req, res, next) => {
     res.redirect('/login');
   }
 };
+
+// Mount VAT router with protection for API routes
+app.use('/', (req, res, next) => {
+    if (req.path.startsWith('/auth/') || req.path.startsWith('/api/vat/')) {
+        return requireAuth(req, res, next);
+    }
+    next();
+}, vatRouter);
 
 // Login page
 app.get('/login', (req, res) => {
