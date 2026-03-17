@@ -11,7 +11,7 @@ const vatRouter = require('./routes/vat');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PASSWORD = process.env.APP_PASSWORD || 'brainlancer2026';
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 // Middleware
 app.use(express.json());
@@ -256,8 +256,8 @@ app.post('/api/analyze-icp', requireAuth, async (req, res) => {
   const { website, industry, location } = req.body;
 
   try {
-    if (!MISTRAL_API_KEY) {
-      return res.status(500).json({ error: 'Server misconfiguration: MISTRAL_API_KEY is not set.' });
+    if (!ANTHROPIC_API_KEY) {
+      return res.status(500).json({ error: 'Server misconfiguration: ANTHROPIC_API_KEY is not set.' });
     }
 
     // Step A: Scrape submitted website
@@ -315,28 +315,33 @@ Provide personalized outreach hooks for the top 5 matches (either from the scrap
 If website scraping failed, base your analysis on the industry and location provided.
 `;
 
-    const mistralRes = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${MISTRAL_API_KEY}`
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'mistral-large-latest',
+        model: 'claude-haiku-4-5',
+        max_tokens: 2048,
+        system: systemPrompt,
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
-        ],
-        response_format: { type: 'json_object' }
+        ]
       })
     });
 
-    if (!mistralRes.ok) {
-      throw new Error(`Mistral API error: ${mistralRes.statusText}`);
+    if (!anthropicRes.ok) {
+      const errBody = await anthropicRes.text();
+      throw new Error(`Anthropic API error: ${anthropicRes.statusText} — ${errBody}`);
     }
 
-    const mistralData = await mistralRes.json();
-    const result = JSON.parse(mistralData.choices[0].message.content);
+    const anthropicData = await anthropicRes.json();
+    const rawContent = anthropicData.content[0].text;
+    // Strip markdown code fences if present
+    const jsonStr = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/,'').trim();
+    const result = JSON.parse(jsonStr);
 
     res.json(result);
 
